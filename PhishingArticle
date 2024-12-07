@@ -1,0 +1,62 @@
+def generate_email_variations(names, domain="catchingphish.com", custom_formats=None):
+    """
+    Generate email variations for a list of names with customizable formats.
+
+    :param names: List of full names
+    :param domain: The email domain to append (default: example.com)
+    :param custom_formats: List of additional formats using {first}, {last}, and {initial}
+    :return: Dictionary of names with their email variations
+    """
+    email_variations = []
+
+    for name in names:
+        # Split the full name into first and last names
+        parts = name.lower().strip().split()
+        if len(parts) < 2:
+            print(f"Skipping invalid name: {name}")
+            continue
+        first_name, last_name = parts[0], parts[-1]
+        initial = first_name[0]
+
+        # Default variations
+        variations = [
+            f"{first_name}.{last_name}",
+            f"{initial}.{last_name}",
+            f"{initial}{last_name}"
+        ]
+
+        # Add custom formats if provided
+        if custom_formats:
+            for fmt in custom_formats:
+                try:
+                    custom_email = fmt.format(
+                        first=first_name, last=last_name, initial=initial
+                    )
+                    variations.append(custom_email)
+                except KeyError as e:
+                    print(f"Error in custom format '{fmt}': {e}")
+        
+        # Append the domain to each email
+        variations_with_domain = [f"{email}@{domain}" for email in variations]
+        email_variations.append({name: variations_with_domain})
+
+    return email_variations
+
+
+# Example usage
+names_list = ["Amanda Smith", "Andrew Doe", "Brandon Jordan", "Brett Johnson, Brian Stephenson"]
+custom_formats = ["{first}{last}", "{last}.{initial}"]
+
+emails = generate_email_variations(
+    names_list,
+    domain="catchingphish.com",
+    custom_formats=custom_formats
+)
+
+# Print the generated email addresses
+for entry in emails:
+    for name, variations in entry.items():
+        print(f"Name: {name}")
+        print("Email Variations:")
+        for email in variations:
+            print(f" - {email}")
